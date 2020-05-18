@@ -1,14 +1,19 @@
 import { db } from '../util/admin'
 import * as firebase  from 'firebase'
 const config = require('../../firebasecongif.json')
-import { NewUser } from '../dataTypes/usersTypes'
+import { NewUser, LoginUser } from '../dataTypes/usersTypes'
 import { IsValid } from '../dataTypes/isValid'
 import {
     validateSignupData, 
+    validateLoginData, 
     //validateLoginData, 
     //reduceUserDetails
 } from '../util/validators'
-firebase.initializeApp(config)
+if (firebase.apps.length === 0) {
+    firebase.initializeApp({
+        config
+    })
+}
 
 const signup = (_req: any, _res: any) => {
     const newUser: NewUser =  {
@@ -67,4 +72,33 @@ const signup = (_req: any, _res: any) => {
     })
 }
 
-export {signup}
+const login = (_req: any, _res: any) => {
+    const user: LoginUser = {
+        email: _req.body.email,
+        password: _req.body.password
+    }
+
+    const isValid: IsValid = validateLoginData(user)
+
+    if(!isValid.valid) return _res.status(400).json(isValid.errors)
+
+    firebase
+        .auth()
+        .signInWithEmailAndPassword(user.email, user.password)
+        .then((data: any) => {
+            return data.user.getIdToken()
+        })
+        .then((token) => {
+            return _res.json({ token })
+        })
+        .catch((err) => {
+        console.error(err)            
+            return _res
+                .status(403)
+                .json({ general: 'Wrong credentials, please try again' })
+        })
+}
+
+
+
+export {signup, login}

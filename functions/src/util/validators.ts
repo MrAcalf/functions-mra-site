@@ -1,4 +1,4 @@
-import {NewUser} from '../dataTypes/usersTypes'
+import {NewUser, LoginUser} from '../dataTypes/usersTypes'
 import {SignupErrors} from '../dataTypes/errorsTypes'
 const isEmail = (email: string) => {
     const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -11,7 +11,7 @@ const isEmpty = (data: string) => {
     else return false
 }
 
-const verifyErrors = (user: NewUser) => {
+const verifySignupErrors = (user: NewUser) => {
     let errors: SignupErrors = {}
     if (isEmpty(user.email)) {
         errors.email = 'Must not be empty'
@@ -26,7 +26,7 @@ const verifyErrors = (user: NewUser) => {
 }
 
 const validateSignupData = (user: NewUser) => {    
-    const errors: SignupErrors = verifyErrors(user)
+    const errors: SignupErrors = verifySignupErrors(user)
     const valid: boolean = Object.keys(errors).length === 0 ? true : false
     return{
         valid,
@@ -34,4 +34,30 @@ const validateSignupData = (user: NewUser) => {
     }
 }
 
-export {validateSignupData}
+const verifyLoginErrors = (userData: LoginUser) => {
+    let errors: SignupErrors = {}
+    if (isEmpty(userData.email)) errors.email = 'Must not be empty'
+    if (isEmpty(userData.password)) errors.password = 'Must not be empty'
+    return errors
+}
+
+const validateLoginData = (userData: LoginUser) => {
+    const errors: SignupErrors = verifyLoginErrors(userData)
+    const valid: boolean = Object.keys(errors).length === 0 ? true : false
+    return{
+        valid,
+        errors
+    }
+}
+
+const validateReqUrl = (_url: string) => {
+    let reqUrl: string = _url
+
+    if(!isEmpty(reqUrl.trim())){
+        if(reqUrl.trim().substring(0, 4) !== 'http'){
+            reqUrl = `https://${reqUrl.trim()}`
+        } else reqUrl = _url
+    }
+    return reqUrl
+}
+export {validateSignupData, validateLoginData, validateReqUrl}

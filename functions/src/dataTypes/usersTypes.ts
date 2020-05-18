@@ -5,4 +5,9 @@ type NewUser = {
     handle: string
 }
 
-export { NewUser }
+type LoginUser = {
+    email: string,
+    password: string
+}
+
+export { NewUser, LoginUser }
